@@ -13,6 +13,7 @@ import logging
 import sys
 
 from mcp.server.fastmcp import FastMCP
+from mcp.server.transport_security import TransportSecuritySettings
 
 from src.config.config import load_config
 from src.auth.auth_manager import AuthManager
@@ -70,7 +71,9 @@ def main() -> None:
 
     if cfg.mcp_transport == "sse":
         import uvicorn
-        app = server.http_app()  # FastMCP 2.x SSE/HTTP app
+        # Disable DNS rebinding protection — Railway is already TLS-terminated
+        transport_security = TransportSecuritySettings(enable_dns_rebinding_protection=False)
+        app = server.http_app(transport_security=transport_security)  # FastMCP 2.x SSE/HTTP app
         logger.info("SSE transport listening on port %d.", cfg.port)
         uvicorn.run(app, host="0.0.0.0", port=cfg.port, log_level=cfg.log_level.lower())
     else:
