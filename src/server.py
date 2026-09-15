@@ -12,7 +12,7 @@ Usage:
 import logging
 import sys
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 from mcp.server.transport_security import TransportSecuritySettings
 
 from src.config.config import load_config
@@ -36,7 +36,7 @@ def _setup_logging(level: str) -> None:
 # Server factory
 # ---------------------------------------------------------------------------
 
-def create_server() -> tuple[FastMCP, object]:
+def create_server() -> tuple[MCPServer, object]:
     """Build and configure the MCP server. Returns (server, cfg)."""
     cfg = load_config()
     _setup_logging(cfg.log_level)
@@ -54,7 +54,7 @@ def create_server() -> tuple[FastMCP, object]:
         logger.critical("Credential validation failed: %s", exc)
         sys.exit(1)
 
-    server = FastMCP("google-workspace-mcp")
+    server = MCPServer("google-workspace-mcp")
     register_all_tools(server, auth_manager)
     logger.info("All tools registered: send_email, draft_email, append_to_doc.")
 
@@ -73,7 +73,7 @@ def main() -> None:
         import uvicorn
         # Disable DNS rebinding protection — Railway is already TLS-terminated
         transport_security = TransportSecuritySettings(enable_dns_rebinding_protection=False)
-        app = server.http_app(transport_security=transport_security)  # FastMCP 2.x SSE/HTTP app
+        app = server.sse_app(transport_security=transport_security)  # MCPServer 2.x SSE app
         logger.info("SSE transport listening on port %d.", cfg.port)
         uvicorn.run(app, host="0.0.0.0", port=cfg.port, log_level=cfg.log_level.lower())
     else:
