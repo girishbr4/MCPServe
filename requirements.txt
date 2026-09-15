@@ -1,0 +1,15 @@
+# ── MCP SDK ─────────────────────────────────────────────────────────────────
+mcp>=1.0.0
+
+# ── Google API Client ────────────────────────────────────────────────────────
+google-api-python-client>=2.100.0
+google-auth>=2.23.0
+google-auth-oauthlib>=1.1.0
+google-auth-httplib2>=0.1.1
+
+# ── Configuration ────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0
+
+# ── HTTP SSE transport (optional — only needed when MCP_TRANSPORT=sse) ───────
+starlette>=0.27.0
+uvicorn>=0.24.0
