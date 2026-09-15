@@ -9,11 +9,10 @@ Usage:
     MCP_TRANSPORT=sse python -m src.server   # HTTP SSE transport
 """
 
-import asyncio
 import logging
 import sys
 
-from mcp.server.mcpserver import MCPServer
+from mcp.server.fastmcp import FastMCP
 
 from src.config.config import load_config
 from src.auth.auth_manager import AuthManager
@@ -36,7 +35,7 @@ def _setup_logging(level: str) -> None:
 # Server factory
 # ---------------------------------------------------------------------------
 
-def create_server() -> tuple[MCPServer, object]:
+def create_server() -> tuple[FastMCP, object]:
     """Build and configure the MCP server. Returns (server, cfg)."""
     cfg = load_config()
     _setup_logging(cfg.log_level)
@@ -54,7 +53,7 @@ def create_server() -> tuple[MCPServer, object]:
         logger.critical("Credential validation failed: %s", exc)
         sys.exit(1)
 
-    server = MCPServer("google-workspace-mcp")
+    server = FastMCP("google-workspace-mcp")
     register_all_tools(server, auth_manager)
     logger.info("All tools registered: send_email, draft_email, append_to_doc.")
 
@@ -71,13 +70,13 @@ def main() -> None:
 
     if cfg.mcp_transport == "sse":
         import uvicorn
-        app = server.sse_app()
+        app = server.http_app()  # FastMCP 2.x SSE/HTTP app
         logger.info("SSE transport listening on port %d.", cfg.port)
         uvicorn.run(app, host="0.0.0.0", port=cfg.port, log_level=cfg.log_level.lower())
     else:
         # Default: stdio
         logger.info("Running in stdio mode.")
-        asyncio.run(server.run_stdio_async())
+        server.run()  # FastMCP 2.x stdio entrypoint
 
 
 if __name__ == "__main__":

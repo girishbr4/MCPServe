@@ -1,6 +1,6 @@
 """
 Tool Registry
-Central registry that wires tool modules to the MCPServer instance (MCP SDK v2).
+Central registry that wires tool modules to the FastMCP instance (MCP SDK v2).
 
 Each tool is registered via the @server.tool() decorator with explicit
 name, description, and a typed async wrapper that calls the sync handler.
@@ -9,7 +9,7 @@ name, description, and a typed async wrapper that calls the sync handler.
 import logging
 from typing import Any, Optional, Union
 
-from mcp.server.mcpserver import MCPServer
+from mcp.server.fastmcp import FastMCP
 
 from src.auth.auth_manager import AuthManager
 from src.tools.gmail.send_email import handle_send_email
@@ -19,9 +19,9 @@ from src.tools.docs.append_to_doc import handle_append_to_doc
 logger = logging.getLogger(__name__)
 
 
-def register_all_tools(server: MCPServer, auth_manager: AuthManager) -> None:
+def register_all_tools(server: FastMCP, auth_manager: AuthManager) -> None:
     """
-    Register all three tools with the MCPServer instance using the v2 @tool decorator.
+    Register all three tools with the FastMCP instance using the v2 @tool decorator.
     Each tool is a typed async function; the SDK infers the JSON schema from type hints.
     """
 
